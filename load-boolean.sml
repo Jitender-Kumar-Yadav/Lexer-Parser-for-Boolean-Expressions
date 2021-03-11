@@ -1,4 +1,3 @@
-exception invalidTokenError of string
 structure booleanLrVals = booleanLrValsFun(structure Token = LrParser.Token)
 structure booleanLex = booleanLexFun(structure Tokens = booleanLrVals.Tokens);
 structure booleanParser =
@@ -38,5 +37,6 @@ fun scanParse filename =
         val s = TextIO.inputAll file
         val _ = TextIO.closeIn file
     in
-		(parseString(s)) handle (invalidTokenError msg) => (msg)
+		(parseString(s)) 
 	end
+		handle invalidTokenError msg => print("\n"^msg^"\n");
