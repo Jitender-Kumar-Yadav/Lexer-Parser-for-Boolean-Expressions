@@ -5,19 +5,19 @@ structure Tokens = Tokens
 	type ('a,'b) token = ('a,'b) Tokens.token  
 	type lexresult = (svalue, pos) token
 	
-	val col = ref 15
+	val col = ref 0
+	val yylineno = ref 1
 	val count = ref 0
-	val eof = fn () => (print("]\n"); Tokens.EOF(3, !col))
+	val eof = fn () => (print("]\n"); Tokens.EOF(!yylineno, !col))
 	val ret = fn (e : string) => if ((!count) = 0) then print("["^e) else print(", "^e)
 
 %%
 %header (functor booleanLexFun(structure Tokens: boolean_TOKENS));
-%count
 alpha = [A-Za-z];
 ws = [\ \t];
 
 %%
-\n				=> (col := 0; lex());
+\n				=> (col := 0; yylineno := !yylineno + 1; lex());
 {ws}+			=> (col := (!col) + size(yytext); lex());
 "AND"			=> (col := (!col) + 3; ret("AND \""^yytext^"\""); count := (!count) + 1; Tokens.AND(!yylineno,!col));
 "OR"			=> (col := (!col) + 2; ret("OR \""^yytext^"\""); count := (!count) + 1; Tokens.OR(!yylineno,!col));

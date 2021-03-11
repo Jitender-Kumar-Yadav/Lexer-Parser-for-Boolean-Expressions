@@ -1,3 +1,4 @@
+exception invalidTokenError of string
 structure booleanLrVals = booleanLrValsFun(structure Token = LrParser.Token)
 structure booleanLex = booleanLexFun(structure Tokens = booleanLrVals.Tokens);
 structure booleanParser =
@@ -6,10 +7,10 @@ structure booleanParser =
      	       structure Lex = booleanLex)
 
 fun invoke lexstream =
-    	     	let fun print_error (s,linenum:int, col:int) =
+    	     	let fun print_error (s, linenum:int, col:int) =
 					TextIO.output(TextIO.stdOut, "Syntax Error:" ^ (Int.toString linenum) ^ ":" ^ (Int.toString col) ^ ":" ^ s ^ "\n")
 		in
-		    booleanParser.parse(0,lexstream,print_error,())
+		    booleanParser.parse(0, lexstream, print_error, ())
 		end
 
 fun stringToLexer str =
@@ -31,4 +32,11 @@ fun parse (lexer) =
 
 val parseString = parse o stringToLexer
 
-fun parselex(str : string) = parseString(str) handle (invalidTokenError msg) => TextIO.output(TextIO.stdOut, msg)
+fun scanParse filename =
+	let
+		val file = TextIO.openIn filename
+        val s = TextIO.inputAll file
+        val _ = TextIO.closeIn file
+    in
+		(parseString(s)) handle (invalidTokenError msg) => (msg)
+	end

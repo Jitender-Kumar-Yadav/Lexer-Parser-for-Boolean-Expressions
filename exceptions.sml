@@ -1,1 +1,0 @@
-exception invalidTokenError of string;
